@@ -31,7 +31,7 @@ def init_pass(M, T):
 	# create L
 	for i in range(len(M)):
 		if not L:
-			if MIS(i) <= floa(count(i))/number_of_transactions:
+			if MIS(i) <= float(count(i))/number_of_transactions:
 				L.append(item(i))
 				thld = MIS(i)
 		else:
