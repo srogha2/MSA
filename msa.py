@@ -35,7 +35,7 @@ def init_pass(M, T):
 				L.append(item(i))
 				thld = MIS(i)
 		else:
-			if (count(i)/number_of_transactions >= thld):
+			if (float(count(i))/number_of_transactions >= thld):
 				L.append(item(i))
 
 _I = list()
@@ -56,10 +56,15 @@ def read_parameters():
 		for line in params:
 			process(line)
 	I = [item for sublist in _I for item in sublist]
+	
+
+def sort(M):
+	global sorted_I_MIS_count
 	# sort I_MIS_count based on MIS
-	sorted_I_MIS_count = sorted(I_MIS_count,key=lambda x: (x[1]))
+	sorted_I_MIS_count = sorted(M,key=lambda x: (x[1]))
 
 read_parameters()
+sort(I_MIS_count)
 init_pass(sorted_I_MIS_count, T)
 
 
