@@ -3,11 +3,11 @@ import re
 # SDC = 0
 I = list() # items list
 MS = list() # support counts of items
+T = list() # list of transactions
 I_MIS_count = list() # 3D list with (item, MIS, count)
 sorted_I_MIS_count = list()
 L = list() # init-pass(M,T)
-T = [[20, 80], [10, 20, 80]]
-number_of_transactions = 2
+number_of_transactions = 0
 number_of_items = 0
 
 # these 3 functions return values form the 3D list
@@ -56,13 +56,29 @@ def read_parameters():
 		for line in params:
 			process(line)
 	I = [item for sublist in _I for item in sublist]
-	
+
+def process_transactions(line):
+    t = list()
+    global number_of_trans
+    line = re.sub('[\{\}]','',line)
+    for item in line.split(', '):
+        t.append(int(item))
+    return t
+
+def read_transactions():
+    global T
+    global number_of_transactions
+    f = open('input-data.txt', 'r')
+    for line in f:
+        T.append(process_transactions(line))
+        number_of_transactions+=1
 
 def sort(M):
 	global sorted_I_MIS_count
 	# sort I_MIS_count based on MIS
 	sorted_I_MIS_count = sorted(M,key=lambda x: (x[1]))
 
+read_transactions()
 read_parameters()
 sort(I_MIS_count)
 init_pass(sorted_I_MIS_count, T)
