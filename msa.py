@@ -1,12 +1,13 @@
 import re
 
-# SDC = 0
+SDC = 0
 I = list() # items list
 MS = list() # support counts of items
 T = list() # list of transactions
 I_MIS_count = list() # 3D list with (item, MIS, count)
 sorted_I_MIS_count = list()
 L = list() # init-pass(M,T)
+F = list() # list of frequent item-sets (that is, list of 1-item-set, 2-item-set, ..)
 number_of_transactions = 0
 number_of_items = 0
 
@@ -41,12 +42,15 @@ def init_pass(M, T):
 _I = list()
 def process(line):
 	global number_of_items
+    #global SDC
 	if re.findall('\((.+?)\)', line):
 		_I.append([int(x) for x in re.findall('\((.+?)\)', line)])
 		I_MIS_count.append([int(x) for x in re.findall('\((.+?)\)', line)])
 		I_MIS_count[number_of_items].append(float(line.split(' ')[-1]))
 		I_MIS_count[number_of_items].append(0)
 		number_of_items+=1
+	elif re.findall('SDC = ', line):
+            SDC = line.split('SDC = ')[1]
 
 def read_parameters():
 	global I
@@ -59,7 +63,6 @@ def read_parameters():
 
 def process_transactions(line):
     t = list()
-    global number_of_trans
     line = re.sub('[\{\}]','',line)
     for item in line.split(', '):
         t.append(int(item))
@@ -78,12 +81,15 @@ def sort(M):
 	# sort I_MIS_count based on MIS
 	sorted_I_MIS_count = sorted(M,key=lambda x: (x[1]))
 
+def ms_apriori(T, MS, SDC):
+    F1 = list()
+    sort(MS)
+    init_pass(sorted_I_MIS_count, T)
+    for item, l in enumerate(L):
+       if MIS(item) <= float(count(item))/number_of_transactions:
+          F1.append(l) 
+    F.append(F1)
+
 read_transactions()
 read_parameters()
-sort(I_MIS_count)
-init_pass(sorted_I_MIS_count, T)
-
-
-
-
-
+ms_apriori(T, I_MIS_count, SDC)
