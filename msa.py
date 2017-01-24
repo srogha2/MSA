@@ -81,7 +81,7 @@ def sort(M):
 	# sort I_MIS_count based on MIS
 	sorted_I_MIS_count = sorted(M,key=lambda x: (x[1]))
 
-def ms_apriori(T, MS, SDC):
+def msa(T, MS, SDC):
     F1 = list()
     sort(MS)
     init_pass(sorted_I_MIS_count, T)
@@ -92,4 +92,4 @@ def ms_apriori(T, MS, SDC):
 
 read_transactions()
 read_parameters()
-ms_apriori(T, I_MIS_count, SDC)
+msa(T, I_MIS_count, SDC)
