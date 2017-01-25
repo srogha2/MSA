@@ -81,6 +81,19 @@ def sort(M):
 	# sort I_MIS_count based on MIS
 	sorted_I_MIS_count = sorted(M,key=lambda x: (x[1]))
 
+def L2_candidate_gen(L, SDC):
+    C2 = list()
+    for item1, l in enumerate(L):
+        if MIS(item1) <= float(count(item1))/number_of_transactions:
+            l_index = L.index(l)
+            L_after_l = L[l_index + 1:]
+            for item2, h in enumerate(L_after_l):
+                if MIS(item1) <= float(count(item2))/number_of_transactions:
+                    if abs((float(count(item2))/number_of_transactions) - (float(count(item1))/number_of_transactions)) <= SDC:
+                        c = [l, h]
+                        C2.append(c)
+    return C2
+
 def msa(T, MS, SDC):
     F1 = list()
     sort(MS)
@@ -89,6 +102,11 @@ def msa(T, MS, SDC):
        if MIS(item) <= float(count(item))/number_of_transactions:
           F1.append(l) 
     F.append(F1)
+    i = 2
+    while len(F) >= (i-1):
+        if i == 2:
+            C2 = L2_candidate_gen(L, SDC)
+        i+=1
 
 read_transactions()
 read_parameters()
