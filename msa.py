@@ -117,7 +117,7 @@ def MScandidate_gen(F, SDC, k_1):
 		for ip in range(len(F)): #f2
 			if (i != ip):
 				# compare the k-2 first items of the two subsets
-				for k in range(0,k_1):
+				for k in range(0,k_1-1):
 					if (F[i][k] != F[ip][k]):
 						continue
 					index_i = find_index_in_M(F[i][k_1-1])
@@ -144,7 +144,7 @@ def msa(T, MS, SDC):
 		item_index_in_M = find_index_in_M(l)
 		if MIS(item_index_in_M) <= support(item_index_in_M):
 			F1.append(l) 
-	F.append(F1) # why do we need F?? it is a list of lists?
+	F.append(F1) # why do we need F?? it is a list of lists
 	i = 2
 	while len(F) >= (i-1):
 		if i == 2:
