@@ -1,4 +1,5 @@
 import re
+import itertools
 
 SDC = 0
 I = list() # items list
@@ -45,7 +46,7 @@ def init_pass(M, T):
 	# create L
 	for i in range(len(M)):
 		if not L:
-			if MIS(i) <= support(i):
+			if MIS(i) <= support(i): #check <= or <
 				L.append(item(i))
 				thld = MIS(i)
 		else:
@@ -55,7 +56,7 @@ def init_pass(M, T):
 _I = list()
 def process(line):
 	global number_of_items
-	#global SDC
+	global SDC
 	if re.findall('\((.+?)\)', line):
 		_I.append([int(x) for x in re.findall('\((.+?)\)', line)])
 		I_MIS_count_support.append([int(x) for x in re.findall('\((.+?)\)', line)])
@@ -64,7 +65,7 @@ def process(line):
 		I_MIS_count_support[number_of_items].append(0)
 		number_of_items+=1
 	elif re.findall('SDC = ', line):
-			SDC = line.split('SDC = ')[1]
+		SDC = float(line.split(' ')[-1])
 
 def read_parameters():
 	global I
@@ -98,34 +99,59 @@ def sort(M):
 def L2_candidate_gen(L, SDC):
 	C2 = list()
 	for l in L:
-		item1_index_in_M =  find_index_in_M(l)
+		item1_index_in_M = find_index_in_M(l)
 		if MIS(item1_index_in_M) <= support(item1_index_in_M):
 			l_index = L.index(l)
 			L_after_l = L[l_index + 1:]
 			for h in L_after_l:
-				item2_index_in_M =  find_index_in_M(h)
+				item2_index_in_M = find_index_in_M(h)
 				if MIS(item1_index_in_M) <= support(item2_index_in_M):
 					if abs((support(item2_index_in_M)) - (support(item1_index_in_M))) <= SDC:
 						c = [l, h]
 						C2.append(c)
 	return C2
 
+def MScandidate_gen(F, SDC, k_1):
+	Ck = list()
+	for i in range(len(F)): #f1
+		for ip in range(len(F)): #f2
+			if (i != ip):
+				# compare the k-2 first items of the two subsets
+				for k in range(0,k_1):
+					if (F[i][k] != F[ip][k]):
+						continue
+					index_i = find_index_in_M(F[i][k_1-1])
+					index_ip = find_index_in_M(F[ip][k_1-1])
+					if (index_i < index_ip):
+						if abs((support(index_i)) - (support(index_ip))) <= SDC:
+							c = F[i][:-1]
+							c.append(F[i][k_1-1])
+							c.append(F[ip][k_1-1])
+							Ck.append(c)
+							# create k-1 subsets of c
+							k_1_subsets = list(itertools.combinations(c, k_1))
+							for s in k_1_subsets:
+								if (c[0] in s) or (MIS(find_index_in_M(c[1])) == MIS(find_index_in_M(c[0]))):
+									if s in F:
+										Ck.remove(c)
+	return Ck
+
 def msa(T, MS, SDC):
 	F1 = list()
 	sort(MS)
 	init_pass(sorted_I_MIS_count_support, T)
-
 	for item, l in enumerate(L):
-		item_index_in_M =  find_index_in_M(l)
+		item_index_in_M = find_index_in_M(l)
 		if MIS(item_index_in_M) <= support(item_index_in_M):
-		  F1.append(l) 
-	F.append(F1)
+			F1.append(l) 
+	F.append(F1) # why do we need F?? it is a list of lists?
 	i = 2
 	while len(F) >= (i-1):
 		if i == 2:
-			 C2 = L2_candidate_gen(L, SDC)
+			C2 = L2_candidate_gen(L, SDC)
 		i+=1
 
 read_transactions()
 read_parameters()
 msa(T, I_MIS_count_support, SDC)
+# MScandidate_gen(C2, SDC, 2)
