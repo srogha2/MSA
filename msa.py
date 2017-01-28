@@ -138,8 +138,9 @@ def MScandidate_gen(F, SDC, k_1):
 							k_1_subsets = list(itertools.combinations(c, k_1))
 							for s in k_1_subsets:
 								if (c[0] in s) or (MIS(find_index_in_M(c[1])) == MIS(find_index_in_M(c[0]))):
-									if s in F: # ?? Needs to be changed
-										Ck.remove(c)
+									for f in F:
+										if s in f[0]: # Check ??
+											Ck.remove(c)
 	return Ck
 
 def msa(T, MS, SDC):
@@ -157,7 +158,6 @@ def msa(T, MS, SDC):
 		if k == 2:
 			C_k = L2_candidate_gen(L, SDC)
 		else:
-			print F[k-2]
 			C_k = MScandidate_gen(F[k-2], SDC, k-1)
 		c_list = list()
 		for t in T:
@@ -175,11 +175,8 @@ def msa(T, MS, SDC):
 				if MIS(item_index_in_M) <= float(c_list[index][1])/number_of_transactions:
 					Fk.append([c, c_list[index][1]])
 		if len(Fk) != 0:
-			#print k
-			#print Fk
 			F.append(Fk)
 		k+=1
-	print F
 
 read_transactions()
 read_parameters()
