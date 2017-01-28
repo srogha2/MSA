@@ -28,10 +28,16 @@ def support(i):
 
 #-------------------------------------------------
 
-def find_index_in_M(item):
+def find_index_in_M(item): 
 	for i, sublist in enumerate(sorted_I_MIS_count_support):
-		if item in sublist:
+		if item in sublist: # Shouldn't it be checked against sublist[0]?
 			return i
+	return -1
+
+def find_subl_idx_in_list(item, L):
+	for index, sublist in enumerate(L):
+		if set(item) == set(sublist[0]):
+			return index
 	return -1
 
 def init_pass(M, T):
@@ -118,21 +124,21 @@ def MScandidate_gen(F, SDC, k_1):
 			if (i != ip):
 				# compare the k-2 first items of the two subsets
 				for k in range(0,k_1-1):
-					if (F[i][k] != F[ip][k]):
+					if (F[i][0][k] != F[ip][0][k]):
 						continue
-					index_i = find_index_in_M(F[i][k_1-1])
-					index_ip = find_index_in_M(F[ip][k_1-1])
+					index_i = find_index_in_M(F[i][0][k_1-1])
+					index_ip = find_index_in_M(F[ip][0][k_1-1])
 					if (index_i < index_ip):
 						if abs((support(index_i)) - (support(index_ip))) <= SDC:
-							c = F[i][:-1]
-							c.append(F[i][k_1-1])
-							c.append(F[ip][k_1-1])
+							c = F[i][0][:-1]
+							c.append(F[i][0][k_1-1])
+							c.append(F[ip][0][k_1-1])
 							Ck.append(c)
 							# create k-1 subsets of c
 							k_1_subsets = list(itertools.combinations(c, k_1))
 							for s in k_1_subsets:
 								if (c[0] in s) or (MIS(find_index_in_M(c[1])) == MIS(find_index_in_M(c[0]))):
-									if s in F:
+									if s in F: # ?? Needs to be changed
 										Ck.remove(c)
 	return Ck
 
@@ -140,16 +146,40 @@ def msa(T, MS, SDC):
 	F1 = list()
 	sort(MS)
 	init_pass(sorted_I_MIS_count_support, T)
-	for item, l in enumerate(L):
+	for l in L:
 		item_index_in_M = find_index_in_M(l)
 		if MIS(item_index_in_M) <= support(item_index_in_M):
-			F1.append(l) 
-	F.append(F1) # why do we need F?? it is a list of lists
-	i = 2
-	while len(F) >= (i-1):
-		if i == 2:
-			C2 = L2_candidate_gen(L, SDC)
-		i+=1
+			F1.append([l, count(item_index_in_M)]) 
+	F.append(F1)
+	k = 2
+	while len(F) == k-1:
+		Fk = list()
+		if k == 2:
+			C_k = L2_candidate_gen(L, SDC)
+		else:
+			print F[k-2]
+			C_k = MScandidate_gen(F[k-2], SDC, k-1)
+		c_list = list()
+		for t in T:
+			for index, c in enumerate(C_k):
+				if set(c).issubset(set(t)):
+					index = find_subl_idx_in_list(c, c_list)
+					if index == -1:
+						c_list.append([c,1]) # Add c with c.count=0 to c_list
+					else:
+						c_list[index][1] += 1 # c.count++
+		for c in C_k:
+			index = find_subl_idx_in_list(c, c_list)
+			if index != -1: 
+				item_index_in_M = find_index_in_M(c[0])
+				if MIS(item_index_in_M) <= float(c_list[index][1])/number_of_transactions:
+					Fk.append([c, c_list[index][1]])
+		if len(Fk) != 0:
+			#print k
+			#print Fk
+			F.append(Fk)
+		k+=1
+	print F
 
 read_transactions()
 read_parameters()
