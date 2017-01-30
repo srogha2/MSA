@@ -9,6 +9,8 @@ I_MIS_count_support = list() # 4D list with (item, MIS, count, support)
 sorted_I_MIS_count_support = list()
 L = list() # init-pass(M,T)
 F = list() # list of frequent item-sets (that is, list of 1-item-set, 2-item-set, ..)
+cannot_be_together = list()
+must_have = list()
 number_of_transactions = 0
 number_of_items = 0
 
@@ -61,6 +63,7 @@ def init_pass(M, T):
 
 _I = list()
 def process(line):
+	global cannot_be_together
 	global number_of_items
 	global SDC
 	if re.findall('\((.+?)\)', line):
@@ -72,6 +75,23 @@ def process(line):
 		number_of_items+=1
 	elif re.findall('SDC = ', line):
 		SDC = float(line.split(' ')[-1])
+	elif re.findall('cannot_be_together: ', line):
+		after_colon = re.sub('cannot_be_together: ','',line)
+		split = re.split(r'[},\n]+', after_colon)
+		index = 0
+		for i in range(len(split)):
+			if split[i]:
+				if (split[i][0] == '{') or (split[i][1] == '{'):
+					cannot_be_together.append(map(int, re.findall(r'\d+', split[i])))
+					index += 1
+				else:
+					cannot_be_together[index-1].append(int(re.search(r'\d+', split[i]).group()))
+	elif re.findall('must-have: ', line):
+		after_colon = re.sub('must-have: ','',line)
+		split = after_colon.split(' or ')
+		for i in range(len(split)):
+			if split[i]:
+				must_have.append(int(re.search(r'\d+', split[i]).group()))
 
 def read_parameters():
 	global I
