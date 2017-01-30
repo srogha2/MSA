@@ -30,7 +30,7 @@ def support(i):
 
 def find_index_in_M(item): 
 	for i, sublist in enumerate(sorted_I_MIS_count_support):
-		if item in sublist: # Shouldn't it be checked against sublist[0]?
+		if (item == sublist[0]):
 			return i
 	return -1
 
@@ -52,7 +52,7 @@ def init_pass(M, T):
 	# create L
 	for i in range(len(M)):
 		if not L:
-			if MIS(i) <= support(i): #check <= or <
+			if MIS(i) <= support(i):
 				L.append(item(i))
 				thld = MIS(i)
 		else:
@@ -139,7 +139,7 @@ def MScandidate_gen(F, SDC, k_1):
 							for s in k_1_subsets:
 								if (c[0] in s) or (MIS(find_index_in_M(c[1])) == MIS(find_index_in_M(c[0]))):
 									for f in F:
-										if s in f[0]: # Check ??
+										if s in f[0]:
 											Ck.remove(c)
 	return Ck
 
@@ -168,7 +168,7 @@ def msa(T, MS, SDC):
 				if set(c).issubset(set(t)):
 					index = find_subl_idx_in_list(c, c_list)
 					if index == -1:
-						c_list.append([c,1]) # Add c with c.count=0 to c_list
+						c_list.append([c,1]) # Add c with c.count=1 to c_list 
 					else:
 						c_list[index][1] += 1 # c.count++
 		for c in C_k:
