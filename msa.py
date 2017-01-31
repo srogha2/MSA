@@ -188,12 +188,12 @@ def msa(T, MS, SDC):
 	sort(MS)
 	init_pass(sorted_I_MIS_count_support, T)
 	# Printing frequent 1-itemsets
-	print "\nFrequent 1-itemsets\n"
+	print "Frequent 1-itemsets\n"
 	for l in L:
 		item_index_in_M = find_index_in_M(l)
 		if MIS(item_index_in_M) <= support(item_index_in_M):
 			F1.append([l, count(item_index_in_M)]) 
-			print "\t", count(item_index_in_M), ": {", l, "}"
+			print "\t",count(item_index_in_M),": {",;sys.stdout.softspace=0;print l,;sys.stdout.softspace=0;print "}"
 	print "\n\tTotal number of frequent 1-itemsets = ", len(F1), "\n"
 	F.append(F1)
 	k = 2
@@ -230,7 +230,7 @@ def msa(T, MS, SDC):
 			# Printing frequent k-itemsets
 			print "\nFrequent ",k,"-itemsets\n"
 			for f in Fk:
-				print "\t", f[1], ": {",str(f[0])[1:-1],"}"
+				print "\t", f[1], ": {",;sys.stdout.softspace=0;print str(f[0])[1:-1],;sys.stdout.softspace=0;print "}"
 				print "Tailcount =", f[2]
 			print "\n\tTotal number of frequent ",k,"-itemsets = ", len(Fk), "\n"
 			F.append(Fk)
