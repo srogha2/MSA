@@ -1,5 +1,6 @@
 import re
 import itertools
+import sys
 
 SDC = 0
 I = list() # items list
@@ -13,6 +14,9 @@ cannot_be_together = list()
 must_have = list()
 number_of_transactions = 0
 number_of_items = 0
+
+out_file  = open("output.txt",'w')
+sys.stdout = out_file
 
 # these 3 functions return values form the 4D list
 #-------------------------------------------------
@@ -183,12 +187,13 @@ def msa(T, MS, SDC):
 	F1 = list()
 	sort(MS)
 	init_pass(sorted_I_MIS_count_support, T)
+	# Printing frequent 1-itemsets
 	print "\nFrequent 1-itemsets\n"
 	for l in L:
 		item_index_in_M = find_index_in_M(l)
 		if MIS(item_index_in_M) <= support(item_index_in_M):
 			F1.append([l, count(item_index_in_M)]) 
-			print "\t", count(item_index_in_M), " : ", "{", l, "}"
+			print "\t", count(item_index_in_M), ": {", l, "}"
 	print "\n\tTotal number of frequent 1-itemsets = ", len(F1), "\n"
 	F.append(F1)
 	k = 2
@@ -222,9 +227,10 @@ def msa(T, MS, SDC):
 					tail_index = find_subl_idx_in_list(c[1:], c_tail_list)
 					Fk.append([c, c_list[index][1], c_tail_list[tail_index][1]])
 		if len(Fk) != 0:
+			# Printing frequent k-itemsets
 			print "\nFrequent ",k,"-itemsets\n"
 			for f in Fk:
-				print "\t", f[1], " : ", "{", f[0], "}"
+				print "\t", f[1], ": {",str(f[0])[1:-1],"}"
 				print "Tailcount =", f[2]
 			print "\n\tTotal number of frequent ",k,"-itemsets = ", len(Fk), "\n"
 			F.append(Fk)
