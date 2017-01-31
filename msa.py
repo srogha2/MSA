@@ -122,6 +122,20 @@ def sort(M):
 	# sort I_MIS_count_support based on MIS
 	sorted_I_MIS_count_support = sorted(M,key=lambda x: (x[1]))
 
+def check_for_cannot_be_togethers(Ck, c):
+	for cbt_subset in cannot_be_together:
+		if (len(cbt_subset) > len(c)):
+			continue
+		else:
+			matched_items = 0 # tracks the number of matches in "cannot_be_together" sets
+			for i in range(len(cbt_subset)):
+				if (cbt_subset[i] in c):
+					matched_items += 1
+			if (matched_items == len(cbt_subset)): # if all the elements in one of the "cannot_be_together" sets matches, then remove c
+				Ck.remove(c)
+				break # no need to check the rest of "cannot_be_together" sets
+
+
 def L2_candidate_gen(L, SDC):
 	C2 = list()
 	for l in L:
@@ -135,6 +149,7 @@ def L2_candidate_gen(L, SDC):
 					if abs((support(item2_index_in_M)) - (support(item1_index_in_M))) <= SDC:
 						c = [l, h]
 						C2.append(c)
+						check_for_cannot_be_togethers(C2, c);
 	return C2
 
 def MScandidate_gen(F, SDC, k_1):
@@ -154,6 +169,7 @@ def MScandidate_gen(F, SDC, k_1):
 							c.append(F[i][0][k_1-1])
 							c.append(F[ip][0][k_1-1])
 							Ck.append(c)
+							check_for_cannot_be_togethers(Ck, c);
 							# create k-1 subsets of c
 							k_1_subsets = list(itertools.combinations(c, k_1))
 							for s in k_1_subsets:
