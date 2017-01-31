@@ -139,6 +139,15 @@ def check_for_cannot_be_togethers(Ck, c):
 				Ck.remove(c)
 				break # no need to check the rest of "cannot_be_together" sets
 
+def prune_based_on_must_haves(Fk):
+	pruned_Fk = list()
+	for i in range(len(Fk)):
+		for must_have_item in must_have:
+			if (must_have_item in Fk[i][0]):
+				pruned_Fk.append(Fk[i])
+				continue
+	return pruned_Fk
+
 
 def L2_candidate_gen(L, SDC):
 	C2 = list()
@@ -189,12 +198,15 @@ def msa(T, MS, SDC):
 	init_pass(sorted_I_MIS_count_support, T)
 	# Printing frequent 1-itemsets
 	print "Frequent 1-itemsets\n"
+	total_f1 = 0
 	for l in L:
 		item_index_in_M = find_index_in_M(l)
 		if MIS(item_index_in_M) <= support(item_index_in_M):
-			F1.append([l, count(item_index_in_M)]) 
-			print "\t",count(item_index_in_M),": {",;sys.stdout.softspace=0;print l,;sys.stdout.softspace=0;print "}"
-	print "\n\tTotal number of frequent 1-itemsets = ", len(F1), "\n"
+			F1.append([l, count(item_index_in_M)])
+			if (l in must_have):
+				total_f1 += 1
+				print "\t",count(item_index_in_M),": {",;sys.stdout.softspace=0;print l,;sys.stdout.softspace=0;print "}"
+	print "\n\tTotal number of frequent 1-itemsets = ", total_f1, "\n"
 	F.append(F1)
 	k = 2
 	while len(F) == k-1:
@@ -227,12 +239,13 @@ def msa(T, MS, SDC):
 					tail_index = find_subl_idx_in_list(c[1:], c_tail_list)
 					Fk.append([c, c_list[index][1], c_tail_list[tail_index][1]])
 		if len(Fk) != 0:
+			pruned_Fk = prune_based_on_must_haves(Fk)
 			# Printing frequent k-itemsets
 			print "\nFrequent ",k,"-itemsets\n"
-			for f in Fk:
+			for f in pruned_Fk:
 				print "\t", f[1], ": {",;sys.stdout.softspace=0;print str(f[0])[1:-1],;sys.stdout.softspace=0;print "}"
 				print "Tailcount =", f[2]
-			print "\n\tTotal number of frequent ",k,"-itemsets = ", len(Fk), "\n"
+			print "\n\tTotal number of frequent ",k,"-itemsets = ", len(pruned_Fk), "\n"
 			F.append(Fk)
 		k+=1
 
