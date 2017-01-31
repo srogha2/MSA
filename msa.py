@@ -15,7 +15,16 @@ must_have = list()
 number_of_transactions = 0
 number_of_items = 0
 
-out_file  = open("output.txt",'w')
+if len(sys.argv) == 4:
+	pf_name = sys.argv[1]
+	if_name = sys.argv[2]
+	of_name = sys.argv[3]
+else:
+	pf_name = "parameter-file.txt"
+	if_name = "input-data.txt"
+	of_name = "output.txt"
+
+out_file  = open(of_name,'w')
 sys.stdout = out_file
 
 # these 3 functions return values form the 4D list
@@ -101,7 +110,7 @@ def read_parameters():
 	global I
 	global sorted_I_MIS_count_support
 	# read items and their MISs from the parameter file
-	with open ('parameter-file.txt') as params:
+	with open (pf_name) as params:
 		for line in params:
 			process(line)
 	I = [item for sublist in _I for item in sublist]
@@ -116,7 +125,7 @@ def process_transactions(line):
 def read_transactions():
 	global T
 	global number_of_transactions
-	f = open('input-data.txt', 'r')
+	f = open(if_name, 'r')
 	for line in f:
 		T.append(process_transactions(line))
 		number_of_transactions+=1
@@ -241,11 +250,13 @@ def msa(T, MS, SDC):
 		if len(Fk) != 0:
 			pruned_Fk = prune_based_on_must_haves(Fk)
 			# Printing frequent k-itemsets
-			print "\nFrequent ",k,"-itemsets\n"
+			if len(pruned_Fk) > 0:
+				print "\nFrequent",k,;sys.stdout.softspace=0;print "-itemsets\n"
 			for f in pruned_Fk:
 				print "\t", f[1], ": {",;sys.stdout.softspace=0;print str(f[0])[1:-1],;sys.stdout.softspace=0;print "}"
 				print "Tailcount =", f[2]
-			print "\n\tTotal number of frequent ",k,"-itemsets = ", len(pruned_Fk), "\n"
+			if len(pruned_Fk) > 0:
+				print "\n\tTotal number of frequent ",k,"-itemsets = ", len(pruned_Fk), "\n"
 			F.append(Fk)
 		k+=1
 
