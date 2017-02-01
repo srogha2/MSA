@@ -256,7 +256,7 @@ def msa(T, MS, SDC):
 				print "\t", f[1], ": {",;sys.stdout.softspace=0;print str(f[0])[1:-1],;sys.stdout.softspace=0;print "}"
 				print "Tailcount =", f[2]
 			if len(pruned_Fk) > 0:
-				print "\n\tTotal number of frequent ",k,"-itemsets = ", len(pruned_Fk), "\n"
+				print "\n\tTotal number of frequent",k,;sys.stdout.softspace=0;print "-itemsets = ", len(pruned_Fk), "\n"
 			F.append(Fk)
 		k+=1
 

@@ -6,8 +6,11 @@ out_file  = open(sys.argv[1],'w')
 sys.stdout = out_file
 
 num_of_transactions = 100
-max_size_of_transaction = 15
+max_size_of_transaction = 5
 data_set_granularity = 10
+max_num_of_cannot_be_togethers = 10
+max_size_of_cannot_be_togethers = 3
+max_num_of_must_haves = 4
 MIS_start = 0.1
 MIS_end = 0.5
 SDC_start = 0.1
@@ -37,12 +40,12 @@ for i in range(data_set_granularity,201,data_set_granularity):
 print "SDC =", round(random.uniform(SDC_start,SDC_end),2)
 
 print "cannot_be_together: ",;sys.stdout.softspace=0
-for i in range(0,random.randint(2,6)):
+for i in range(0,random.randint(2,max_num_of_cannot_be_togethers)):
 	print "{",;sys.stdout.softspace=0;
-	print str(random.sample(rand_list, random.randint(2,4)))[1:-1],;sys.stdout.softspace=0;
+	print str(random.sample(rand_list, random.randint(2,max_size_of_cannot_be_togethers)))[1:-1],;sys.stdout.softspace=0;
 	print "}, ",;sys.stdout.softspace=0;
 print "{",;sys.stdout.softspace=0; print str(random.sample(rand_list, random.randint(1,3)))[1:-1],;sys.stdout.softspace=0; print "}"
 
 print "must-have: ",;sys.stdout.softspace=0
-must_have = " or ".join(map(str,random.sample(rand_list, random.randint(2,4))))
+must_have = " or ".join(map(str,random.sample(rand_list, random.randint(2,max_num_of_must_haves))))
 print must_have
