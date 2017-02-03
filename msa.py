@@ -4,11 +4,9 @@ import sys
 
 SDC = 0
 I = list() # items list
-MS = list() # support counts of items
 T = list() # list of transactions
 I_MIS_count_support = list() # 4D list with (item, MIS, count, support)
 sorted_I_MIS_count_support = list()
-L = list() # init-pass(M,T)
 F = list() # list of frequent item-sets (that is, list of 1-item-set, 2-item-set, ..)
 cannot_be_together = list()
 must_have = list()
@@ -56,7 +54,7 @@ def find_subl_idx_in_list(item, L):
 	return -1
 
 def init_pass(M, T):
-	global L
+	L = list()
 	# find support counts for each item
 	for i in range(len(M)):
 		for t in T:
@@ -69,10 +67,11 @@ def init_pass(M, T):
 		if not L:
 			if MIS(i) <= support(i):
 				L.append(item(i))
-				thld = MIS(i)
+				first_MIS = MIS(i)
 		else:
-			if (support(i) >= thld):
+			if (support(i) >= first_MIS):
 				L.append(item(i))
+	return L
 
 _I = list()
 def process(line):
@@ -108,7 +107,6 @@ def process(line):
 
 def read_parameters():
 	global I
-	global sorted_I_MIS_count_support
 	# read items and their MISs from the parameter file
 	with open (pf_name) as params:
 		for line in params:
@@ -136,17 +134,14 @@ def sort(M):
 	sorted_I_MIS_count_support = sorted(M,key=lambda x: (x[1]))
 
 def check_for_cannot_be_togethers(Ck, c):
-	for cbt_subset in cannot_be_together:
-		if (len(cbt_subset) > len(c)):
-			continue
-		else:
-			matched_items = 0 # tracks the number of matches in "cannot_be_together" sets
-			for i in range(len(cbt_subset)):
-				if (cbt_subset[i] in c):
-					matched_items += 1
-			if (matched_items == len(cbt_subset)): # if all the elements in one of the "cannot_be_together" sets matches, then remove c
-				Ck.remove(c)
-				break # no need to check the rest of "cannot_be_together" sets
+	for cbt_set in cannot_be_together:
+		matched_items = 0 # tracks the number of matches in "cannot_be_together" sets
+		for i in range(len(cbt_set)):
+			if (cbt_set[i] in c):
+				matched_items += 1
+		if (matched_items == 2): # if all the elements in one of the "cannot_be_together" sets matches, then remove c
+			Ck.remove(c)
+			break # no need to check the rest of "cannot_be_together" sets
 
 def prune_based_on_must_haves(Fk):
 	pruned_Fk = list()
@@ -182,7 +177,7 @@ def MScandidate_gen(F, SDC, k_1):
 				# compare the k-2 first items of the two subsets
 				for k in range(0,k_1-1):
 					if (F[i][0][k] != F[ip][0][k]):
-						continue
+						break
 					index_i = find_index_in_M(F[i][0][k_1-1])
 					index_ip = find_index_in_M(F[ip][0][k_1-1])
 					if (index_i < index_ip):
@@ -203,10 +198,9 @@ def MScandidate_gen(F, SDC, k_1):
 
 def msa(T, MS, SDC):
 	F1 = list()
+	L = list()
 	sort(MS)
-	init_pass(sorted_I_MIS_count_support, T)
-	# Printing frequent 1-itemsets
-	print "Frequent 1-itemsets\n"
+	L = init_pass(sorted_I_MIS_count_support, T)
 	total_f1 = 0
 	for l in L:
 		item_index_in_M = find_index_in_M(l)
@@ -214,12 +208,19 @@ def msa(T, MS, SDC):
 			F1.append([l, count(item_index_in_M)])
 			if (l in must_have):
 				total_f1 += 1
+				if (total_f1 == 1):
+					# Printing frequent 1-itemsets
+					print "Frequent 1-itemsets\n"
 				print "\t",count(item_index_in_M),": {",;sys.stdout.softspace=0;print l,;sys.stdout.softspace=0;print "}"
-	print "\n\tTotal number of frequent 1-itemsets = ", total_f1, "\n"
-	F.append(F1)
+	if (total_f1 != 0):
+		print "\n\tTotal number of frequent 1-itemsets = ", total_f1, "\n"
+	if F1:
+		F.append(F1)
 	k = 2
 	while len(F) == k-1:
-		Fk = list()
+		Fk = list() # List of candidate-attributes (say, CAs) 
+		# where each CA is a list of {candidate (say, C), count, tailcount}
+		# where C is a list is a list of items
 		if k == 2:
 			C_k = L2_candidate_gen(L, SDC)
 		else:
@@ -257,7 +258,8 @@ def msa(T, MS, SDC):
 				print "Tailcount =", f[2]
 			if len(pruned_Fk) > 0:
 				print "\n\tTotal number of frequent",k,;sys.stdout.softspace=0;print "-itemsets = ", len(pruned_Fk), "\n"
-			F.append(Fk)
+			if Fk:
+				F.append(Fk)
 		k+=1
 
 read_transactions()
