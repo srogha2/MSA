@@ -1,7 +1,9 @@
 import re
 import itertools
 import sys
+from datetime import datetime
 
+debug = 0
 SDC = 0
 I = list() # items list
 T = list() # list of transactions
@@ -25,6 +27,13 @@ else:
 out_file  = open(of_name,'w')
 sys.stdout = out_file
 
+# debug function
+def debug_log(msg):
+	if debug == 1:
+		print "\n", msg
+		print datetime.now().strftime('%H:%M:%S'), "\n"
+
+
 # these 3 functions return values form the 4D list
 #-------------------------------------------------
 def item(i):
@@ -38,7 +47,6 @@ def count(i):
 
 def support(i):
 	return sorted_I_MIS_count_support[i][3]
-
 #-------------------------------------------------
 
 def find_index_in_M(item): 
@@ -149,7 +157,7 @@ def prune_based_on_must_haves(Fk):
 		for must_have_item in must_have:
 			if (must_have_item in Fk[i][0]):
 				pruned_Fk.append(Fk[i])
-				continue
+				break;
 	return pruned_Fk
 
 
@@ -197,10 +205,12 @@ def MScandidate_gen(F, SDC, k_1):
 	return Ck
 
 def msa(T, MS, SDC):
+	debug_log("Starting msa")
 	F1 = list()
 	L = list()
 	sort(MS)
 	L = init_pass(sorted_I_MIS_count_support, T)
+	debug_log("Completed init_pass")
 	total_f1 = 0
 	for l in L:
 		item_index_in_M = find_index_in_M(l)
@@ -217,14 +227,21 @@ def msa(T, MS, SDC):
 	if F1:
 		F.append(F1)
 	k = 2
+	debug_log("Completed F1 generation")
 	while len(F) == k-1:
 		Fk = list() # List of candidate-attributes (say, CAs) 
 		# where each CA is a list of {candidate (say, C), count, tailcount}
 		# where C is a list is a list of items
 		if k == 2:
 			C_k = L2_candidate_gen(L, SDC)
+			if debug == 1:
+				print "No. of candidates generated:", len(C_k), "for level 2"
+			debug_log("Completed L2 candidate generation")
 		else:
 			C_k = MScandidate_gen(F[k-2], SDC, k-1)
+			if debug == 1:
+				print "No. of candidates generated:", len(C_k), "for level", k
+			debug_log("Completed MS candidate generation")
 		c_tail_list = list()
 		c_list = list()
 		for t in T:
@@ -241,6 +258,7 @@ def msa(T, MS, SDC):
 						c_tail_list.append([c[1:],1]) # Add c-c[0] with (c-c[0]).count=1 to c_tail_list
 					else:
 						c_tail_list[index][1] += 1 # (c-c[0]).count++
+		debug_log("At the end of complicated loops")
 		for c in C_k:
 			index = find_subl_idx_in_list(c, c_list)
 			if index != -1: 
@@ -248,6 +266,7 @@ def msa(T, MS, SDC):
 				if MIS(item_index_in_M) <= float(c_list[index][1])/number_of_transactions:
 					tail_index = find_subl_idx_in_list(c[1:], c_tail_list)
 					Fk.append([c, c_list[index][1], c_tail_list[tail_index][1]])
+		debug_log("Created Fk")
 		if len(Fk) != 0:
 			pruned_Fk = prune_based_on_must_haves(Fk)
 			# Printing frequent k-itemsets
@@ -260,6 +279,9 @@ def msa(T, MS, SDC):
 				print "\n\tTotal number of frequent",k,;sys.stdout.softspace=0;print "-itemsets = ", len(pruned_Fk), "\n"
 			if Fk:
 				F.append(Fk)
+		if debug == 1:
+			print "Size of Fk:", len(Fk), "for level", k
+		debug_log("Completed current pass")
 		k+=1
 
 read_transactions()
