@@ -57,7 +57,7 @@ def find_index_in_M(item):
 
 def find_subl_idx_in_list(item, L):
 	for index, sublist in enumerate(L):
-		if set(item) == set(sublist[0]):
+		if item == sublist[0]:
 			return index
 	return -1
 
@@ -242,7 +242,6 @@ def msa(T, MS, SDC):
 			if debug == 1:
 				print "No. of candidates generated:", len(C_k), "for level", k
 			debug_log("Completed MS candidate generation")
-		c_tail_list = list()
 		c_list = list()
 		for t in T:
 			for index, c in enumerate(C_k):
@@ -252,20 +251,17 @@ def msa(T, MS, SDC):
 						c_list.append([c,1]) # Add c with c.count=1 to c_list 
 					else:
 						c_list[index][1] += 1 # c.count++
-				if set(c[1:len(c)]).issubset(set(t)):
-					index = find_subl_idx_in_list(c[1:], c_tail_list)
-					if index == -1:
-						c_tail_list.append([c[1:],1]) # Add c-c[0] with (c-c[0]).count=1 to c_tail_list
-					else:
-						c_tail_list[index][1] += 1 # (c-c[0]).count++
 		debug_log("At the end of complicated loops")
 		for c in C_k:
 			index = find_subl_idx_in_list(c, c_list)
 			if index != -1: 
 				item_index_in_M = find_index_in_M(c[0])
 				if MIS(item_index_in_M) <= float(c_list[index][1])/number_of_transactions:
-					tail_index = find_subl_idx_in_list(c[1:], c_tail_list)
-					Fk.append([c, c_list[index][1], c_tail_list[tail_index][1]])
+					tailcount = 0
+					for t in T:
+						if set(c[1:]).issubset(set(t)):
+							tailcount+=1
+					Fk.append([c, c_list[index][1], tailcount])
 		debug_log("Created Fk")
 		if len(Fk) != 0:
 			pruned_Fk = prune_based_on_must_haves(Fk)
