@@ -186,6 +186,8 @@ def MScandidate_gen(F, SDC, k_1):
 				for k in range(0,k_1-1):
 					if (F[i][0][k] != F[ip][0][k]):
 						break
+					if k!=k_1-2:
+					 	continue
 					index_i = find_index_in_M(F[i][0][k_1-1])
 					index_ip = find_index_in_M(F[ip][0][k_1-1])
 					if (index_i < index_ip):
