@@ -175,7 +175,11 @@ def L2_candidate_gen(L, SDC):
 						c = [l, h]
 						C2.append(c)
 						check_for_cannot_be_togethers(C2, c);
-	return C2
+	newC2 = list()
+	for c in C2:
+		newC = [c,0,0] #candidate set, support, tail support
+		newC2.append(newC)
+	return newC2
 
 def MScandidate_gen(F, SDC, k_1):
 	Ck = list()
@@ -204,7 +208,11 @@ def MScandidate_gen(F, SDC, k_1):
 									for f in F:
 										if s in f[0]:
 											Ck.remove(c)
-	return Ck
+	newCk = list()
+	for c in Ck:
+		newC = [c,0,0] #candidate set, support, tail support
+		newCk.append(newC)
+	return newCk
 
 def msa(T, MS, SDC):
 	debug_log("Starting msa")
@@ -244,26 +252,18 @@ def msa(T, MS, SDC):
 			if debug == 1:
 				print "No. of candidates generated:", len(C_k), "for level", k
 			debug_log("Completed MS candidate generation")
-		c_list = list()
 		for t in T:
-			for index, c in enumerate(C_k):
-				if set(c).issubset(set(t)):
-					index = find_subl_idx_in_list(c, c_list)
-					if index == -1:
-						c_list.append([c,1]) # Add c with c.count=1 to c_list 
-					else:
-						c_list[index][1] += 1 # c.count++
+			for c in C_k:
+				if set(c[0]).issubset(set(t)):
+					c[1] += 1
+				if set(c[0][1:]).issubset(set(t)):
+					c[2] += 1
 		debug_log("At the end of complicated loops")
 		for c in C_k:
-			index = find_subl_idx_in_list(c, c_list)
-			if index != -1: 
-				item_index_in_M = find_index_in_M(c[0])
-				if MIS(item_index_in_M) <= float(c_list[index][1])/number_of_transactions:
-					tailcount = 0
-					for t in T:
-						if set(c[1:]).issubset(set(t)):
-							tailcount+=1
-					Fk.append([c, c_list[index][1], tailcount])
+			if c[1]!=0: # candidate has non-zero support
+				item_index_in_M = find_index_in_M(c[0][0])
+				if MIS(item_index_in_M) <= float(c[1])/number_of_transactions:
+					Fk.append(c)
 		debug_log("Created Fk")
 		if len(Fk) != 0:
 			pruned_Fk = prune_based_on_must_haves(Fk)
