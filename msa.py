@@ -160,6 +160,13 @@ def prune_based_on_must_haves(Fk):
 				break;
 	return pruned_Fk
 
+def is_subset(c, t):
+	for ci in c:
+		if (ci in t):
+			continue
+		else:
+			return 0
+	return 1
 
 def L2_candidate_gen(L, SDC):
 	C2 = list()
@@ -254,9 +261,9 @@ def msa(T, MS, SDC):
 			debug_log("Completed MS candidate generation")
 		for t in T:
 			for c in C_k:
-				if set(c[0]).issubset(set(t)):
+				if (is_subset(c[0], t) == 1):
 					c[1] += 1
-				if set(c[0][1:]).issubset(set(t)):
+				if (is_subset(c[0][1:], t) == 1):
 					c[2] += 1
 		debug_log("At the end of complicated loops")
 		for c in C_k:
