@@ -55,12 +55,6 @@ def find_index_in_M(item):
 			return i
 	return -1
 
-def find_subl_idx_in_list(item, L):
-	for index, sublist in enumerate(L):
-		if item == sublist[0]:
-			return index
-	return -1
-
 def init_pass(M, T):
 	L = list()
 	# find support counts for each item
