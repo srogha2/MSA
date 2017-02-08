@@ -178,7 +178,7 @@ def L2_candidate_gen(L, SDC):
 			for h in L_after_l:
 				item2_index_in_M = find_index_in_M(h)
 				if MIS(item1_index_in_M) <= support(item2_index_in_M):
-					if abs((support(item2_index_in_M)) - (support(item1_index_in_M))) <= SDC:
+					if round(abs((support(item2_index_in_M)) - (support(item1_index_in_M))), 10) <= SDC:
 						c = [l, h]
 						C2.append(c)
 						check_for_cannot_be_togethers(C2, c);
@@ -202,7 +202,7 @@ def MScandidate_gen(F, SDC, k_1):
 					index_i = find_index_in_M(F[i][0][k_1-1])
 					index_ip = find_index_in_M(F[ip][0][k_1-1])
 					if (index_i < index_ip):
-						if abs((support(index_i)) - (support(index_ip))) <= SDC:
+						if (round(abs((support(index_i)) - (support(index_ip))) , 10) <= SDC):
 							c = F[i][0][:-1]
 							c.append(F[i][0][k_1-1])
 							c.append(F[ip][0][k_1-1])
